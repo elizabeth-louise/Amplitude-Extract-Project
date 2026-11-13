@@ -21,13 +21,16 @@ logging.basicConfig( #configuring logs
 logger = logging.getLogger() #assining logger to variable 
 logger.info('Logger was successfully initialised.')
 
+yesterday = datetime.now() - timedelta(days=1) #calculate yesterday
+
+start_time = yesterday.strftime('%Y%m%dT00') #format yesterday and 00:00
+end_time = yesterday.strftime('%Y%m%dT23') #format yesterday and 23:00
+
+# chosen_date = '20261111' #variable so can easily change the date of data being brought through, but also limited to one day so don't overload
+
 zip_dir = 'zip' #creating folder and file name for zip files
 os.makedirs(zip_dir,exist_ok=True)
-zipfilename = f'{zip_dir}/{timestamp}.zip'
-
-data_dir = 'data' #create data folder and file name for jsons
-os.makedirs(data_dir,exist_ok=True)
-filename = f'{data_dir}/{timestamp}.json'
+zipfilename = f'{zip_dir}/{start_time}-T23.zip'
 
 load_dotenv() 
 
@@ -35,13 +38,6 @@ API_KEY = os.environ.get("AMP_API_KEY") #retrieving passkeys from .env
 SECRET_KEY = os.environ.get("AMP_SECRET_KEY")
 
 url = 'https://analytics.eu.amplitude.com/api/2/export'
-
-yesterday = datetime.now() - timedelta(days=1) #calculate yesterday
-
-start_time = yesterday.strftime('%Y%m%dT00') #format yesterday and 00:00
-end_time = yesterday.strftime('%Y%m%dT23') #format yesterday and 23:00
-
-# chosen_date = '20261111' #variable so can easily change the date of data being brought through, but also limited to one day so don't overload
 
 attempt = 1
 max_attempts = 3
