@@ -3,7 +3,7 @@ import json
 import requests
 import logging
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 timestamp = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
@@ -36,7 +36,12 @@ SECRET_KEY = os.environ.get("AMP_SECRET_KEY")
 
 url = 'https://analytics.eu.amplitude.com/api/2/export'
 
-chosen_date = '20261111' #variable so can easily change the date of data being brought through, but also limited to one day so don't overload
+yesterday = datetime.now() - timedelta(days=1) #calculate yesterday
+
+start_time = yesterday.strftime('%Y%m%dT00') #format yesterday and 00:00
+end_time = yesterday.strftime('%Y%m%dT23') #format yesterday and 23:00
+
+# chosen_date = '20261111' #variable so can easily change the date of data being brought through, but also limited to one day so don't overload
 
 attempt = 1
 max_attempts = 3
@@ -45,8 +50,8 @@ while attempt <= max_attempts:
     response = requests.get(
         url,
         params={
-            "start": f'{chosen_date}T00', 
-            "end": f'{chosen_date}T23'
+            "start": {start_time}, 
+            "end": {end_time}
             },
         auth=(API_KEY, SECRET_KEY)
     )
