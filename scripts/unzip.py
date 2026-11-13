@@ -20,6 +20,7 @@ import zipfile
 import gzip
 import shutil
 import tempfile
+from datetime import datetime, timedelta
 
 # Create a temporary directory for extraction for all folder paths
 temp_dir = tempfile.mkdtemp()
@@ -29,11 +30,19 @@ data_dir = "data"
 os.makedirs(data_dir, exist_ok=True)
 logger.info("Environment Setup: beginning unzip process")
 
+zip_dir = 'zip'
+
+yesterday = datetime.now() - timedelta(days=1) #calculate yesterday
+
+start_time = yesterday.strftime('%Y%m%dT00') #format yesterday and 00:00
+
+zipfilename = f'{zip_dir}/{start_time}-T23.zip'
+
 try:
     # Extract the main zip file into the temporary directory - unpacks the zip folder to the temp directory, retrieves gzip files
-    with zipfile.ZipFile("zip/2026-11-13 09-04-22.zip", "r") as zip_ref:
+    with zipfile.ZipFile(zipfilename, "r") as zip_ref: #
         zip_ref.extractall(temp_dir)
-        logger.info(f"amp_events.zip extracted to temp directory: {temp_dir} ")
+        logger.info(f"{zipfilename} extracted to temp directory: {temp_dir} ")
 except Exception as e:
     logger.error(f"Error extracting zip file: {str(e)}")
     raise
@@ -45,7 +54,6 @@ try:
 except Exception as e:
     logger.error(f"Error finding day folder: {str(e)}")
     raise
-#---------------------------
 
 # Walk through the day folder and decompress each .gz file to the data directory
 for root, _, files in os.walk(day_path): #os.walk traverses all subdirectories
@@ -71,4 +79,13 @@ try:
 except Exception as e:
     logger.error(f"Failed to delete temp directory: {str(e)}")
 
+#remove the zip file after jsons have been extracted
+try:
+    os.remove(zipfilename)
+    logger.info(f'zip file {zipfilename} deleted.')
+except Exception as e:
+    logger.error(f"Failed to delete zip file {zipfilename}: {str(e)}")
+
 print("All files extracted to the 'data' directory!")
+
+#may need to alter the file type to .jsonl if not working
