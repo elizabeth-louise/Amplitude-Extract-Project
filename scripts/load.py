@@ -13,8 +13,7 @@ AWS_BUCKET_NAME = os.getenv('AWS_BUCKET_NAME')
 
 # ----- Data file location 📁 -----
 data_dir = 'data'
-test_file = '100011471_2026-11-12_0#0.json'
-file_location = 'data/100011471_2026-11-12_0#0.json'
+file_location = os.listdir(data_dir)
 
 # ----- Connecting to S3 🔗 -----
 s3_client = boto3.client(
@@ -24,4 +23,11 @@ s3_client = boto3.client(
 )
 
 # ----- Uploading file to bucket 🪣 -----
-s3_client.upload_file(file_location, AWS_BUCKET_NAME, test_file)
+for file in file_location:
+    to_upload = f'{data_dir}/{file}' #loops each file path for every file in the data directory
+    try:
+        s3_client.upload_file(to_upload, AWS_BUCKET_NAME, file) #file path, the output location in S3, name of the file in the bucket
+        print(f'File {file} successfully uploaded!')
+        os.remove(to_upload) #once uploaded, delete the file from the local save
+    except Exception as e: #if something goes wrong with the upload
+        print(f'Something went wrong. Error: {e}')
