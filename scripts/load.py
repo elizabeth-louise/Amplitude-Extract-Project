@@ -48,10 +48,23 @@ for file in file_location:
         logger.error(f'Something went wrong. Error: {e}')
 
 # ----- What is already in the bucket? -----
-def list_files_bucket(AWS_BUCKET_NAME): #creating function for listing files in a bucket
+def compare_files_bucket(AWS_BUCKET_NAME): #creating function for listing files in a bucket
     response = s3_client.list_objects_v2( #list objects in the following bucket
         Bucket= AWS_BUCKET_NAME
     )
-    list = response["Contents"] #response is a dictionary, retrieivng the contents
-    for item in list:
-        print(item["Key"]) #response is a list, retrieving the filename from the list
+
+    s3_items=[] #declaring the list
+
+    item_list = response["Contents"] #response is a dictionary, retrieivng the contents
+    for item in item_list:
+        s3_items.append(item["Key"]) #item is a list of dictionaries, retrieving the filename from the list (for each dictionary, retrieve the key) and adding to list of items
+
+    common_elements = set(s3_items).intersection(set(file_location)) #creating sets as allows to compare more easily, intersection compares the values and returns values that are the same
+
+    matched_items = []
+
+    # print(f"Common Elements: ")
+    for item in (common_elements): #for each item in the set print the value
+        # print(item or "No common elements")
+        matched_items.append(item)
+
