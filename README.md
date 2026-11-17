@@ -10,6 +10,12 @@ You will also need to install the following libraries:
 - requests
 - python-dotenv
 
+### Order of Excecution
+
+1. extract.py
+2. unzip.py
+3. load.py
+
 ### API Documentation
 
 See the Amplitude Export API documentation here. https://amplitude.com/docs/apis/analytics/export
@@ -53,9 +59,36 @@ _ if unsuccesssful, depending on the status code either break the loop or contin
 <br>
 The data retrieved will always be for the whole day yesterday.
 
-## Part Two: Load
+## Part Two: Load 
 
-I developed one python script which loads the data to an S3 bucket. This script uploads all files which are in the data folder to my S3 bucket.
+The aim of the load step was to upload the .json files into an S3 bucket and into Snowflake. There are a few steps required to set this up. See the image below for the concepts included in this:
+
+<img src="assets\Load Plan.png" />
+
+#### AWS
+
+Firstly, I setup the requirements in AWS:
+
+- Created the S3 bucket (with bucket versioning enabled)
+- Created KMS (key management service) key
+- Created the policy (what permissions do we have for the S3 bucket and encryption/decryption for KMS key)
+-  Created user
+Created role
+
+#### Python
+
+I then developed one python script which loads the data to an S3 bucket. This script uploads all files which are in the data folder to my S3 bucket. See the section below for further details.
+
+#### Snowflake
+
+Lastly, I set up the connection with Snowflake:
+
+- Created a schema for the project
+- Created the storage integration wth the bucket name and role ARN
+- Created the trust relationship by connecting keys from Snowflake into the role in AWS
+- Created a stage to see the data from the bucket
+- Created an empty table and copied the .json files into it
+
 
 ### Summary of python file
 
