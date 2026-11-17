@@ -65,6 +65,8 @@ I developed one python script which loads the data to an S3 bucket. This script 
 - Retrieves AWS keys from .env
 - Locates the data files
 - Connects to the S3 bucket
-- For loop that uploads data files to the bucket
-- Creates a function that retrieves the list of files already in the bucket
+- Checks the files in the bucket against the files to upload and returns a list matches
+- Two for loops that upload data files to the bucket
+    - First loop uploads the matched files and returns a message that a new version has been uploaded
+    - Second loop uploads any files that are left
 </details>
