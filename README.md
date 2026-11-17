@@ -2,9 +2,30 @@
 
 A python-based data pipeline that extracts data from the Amplitude export API.
 
+### What do you need to run this?
+
+To access the Amplitude Extract API, you will need to have an API_KEY and SECRET_KEY.
+You will also need to install the following libraries:
+
+- requests
+- python-dotenv
+
+### API Documentation
+
+See the Amplitude Export API documentation here. https://amplitude.com/docs/apis/analytics/export
+
+Key things to note:
+
+- If in the EU replace the default URL with 'https://analytics.eu.amplitude.com'
+- Start and end time parameters are required (YYYYMMDDTHH)
+- The Export API events are timestamped in UTC
+- The size limit of the export is 6GB
+- The rate limit is 4 concurrent requests and 360 requests per hour
+- There is a 2 hour delay to events being available in the API
+
 ## Part One: Extract
 
-I developed two scripts to extract from the API. Firstly, I created the extract.py file which retrieves the initial response from the API. Then, as the response was a zip file, I created an unzip.py file to retrieve the .json files (after decompressing further .gzip files). See more detail on these below.
+I developed two python scripts to extract from the API. Firstly, I created the extract.py file which retrieves the initial response from the API. Then, as the response was a zip file, I created an unzip.py file to retrieve the .json files (after decompressing further .gzip files). See more detail on these below.
 
 ### Summary of python files
 
@@ -32,23 +53,20 @@ _ if unsuccesssful, depending on the status code either break the loop or contin
 <br>
 The data retrieved will always be for the whole day yesterday.
 
-### What do you need to run this?
+## Part Two: Load
 
-To access the Amplitude Extract API, you will need to have an API_KEY and SECRET_KEY.
-You will also need to install the following libraries:
+I developed one python script which loads the data to an S3 bucket. This script uploads all files which are in the data folder to my S3 bucket.
 
-- requests
-- python-dotenv
+### Summary of python file
 
-### API Documentation
+<details> 
+<summary>load.py</summary>
 
-See the Amplitude Export API documentation here. https://amplitude.com/docs/apis/analytics/export
-
-Key things to note:
-
-- If in the EU replace the default URL with 'https://analytics.eu.amplitude.com'
-- Start and end time parameters are required (YYYYMMDDTHH)
-- The Export API events are timestamped in UTC
-- The size limit of the export is 6GB
-- The rate limit is 4 concurrent requests and 360 requests per hour
-- There is a 2 hour delay to events being available in the API
+- Retrieves AWS keys from .env
+- Locates the data files
+- Connects to the S3 bucket
+- Checks the files in the bucket against the files to upload and returns a list matches
+- Two for loops that upload data files to the bucket
+    - First loop uploads the matched files and returns a message that a new version has been uploaded
+    - Second loop uploads any files that are left
+</details>
