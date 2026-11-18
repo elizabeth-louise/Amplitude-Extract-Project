@@ -19,7 +19,7 @@ logging.basicConfig( #configuring logs
     level=logging.INFO 
 )
 
-logger = logging.getLogger() #assining logger to variable 
+logger = logging.getLogger() #assigning logger to variable 
 logger.info('Logger was successfully initialised.')
 
 # ----- Defining variables 💬-----
